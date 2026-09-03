@@ -28,3 +28,11 @@ dist
 *.tsbuildinfo
 next-env.d.ts
 .freebuff/
+
+# docs & manuals (not for repo)
+*.pdf
+IMS20B_Manual*.md
+LOGO-PROMPT.md
+motorizer-*.md
+motormatch-*.md
+src/docs/
