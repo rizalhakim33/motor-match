@@ -1,0 +1,39 @@
+{
+  "name": "motor-match",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev -p 3050",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "test": "tsx test/ballscrew.test.ts && tsx test/fan-generic-rotary.test.ts && tsx test/fullSizing.test.ts && tsx test/gainCalculator.test.ts && tsx test/new-mechanisms.test.ts",
+    "test:ballscrew": "tsx test/ballscrew.test.ts",
+    "test:fan": "tsx test/fan-generic-rotary.test.ts",
+    "test:full-sizing": "tsx test/fullSizing.test.ts",
+    "test:gain": "tsx test/gainCalculator.test.ts",
+    "test:mechanisms": "tsx test/new-mechanisms.test.ts"
+  },
+  "dependencies": {
+    "autoprefixer": "^10.5.4",
+    "jspdf": "^4.2.1",
+    "jspdf-autotable": "^5.0.8",
+    "lucide-react": "^1.37.0",
+    "next": "15.1.7",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "recharts": "^3.10.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.12.0",
+    "@types/react": "^19.0.8",
+    "@types/react-dom": "^19.0.3",
+    "eslint": "^9.19.0",
+    "eslint-config-next": "15.1.7",
+    "playwright": "^1.62.1",
+    "postcss": "^8.5.1",
+    "tailwindcss": "^3.4.17",
+    "tsx": "^4.19.0",
+    "typescript": "^5.7.3"
+  }
+}
