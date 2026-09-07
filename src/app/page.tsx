@@ -3,27 +3,24 @@ import MotorWizard from "@/components/wizard/MotorWizard";
 export default function Home() {
   return (
     <div className="min-h-screen bg-surface-50">
-      {/* SEO: H1 + intro SSR-visible for crawler (wizard is client-only) */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 pt-6">
-        <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-surface-900">
-          Kalkulator Sizing Motor Servo, Stepper &amp; Induksi + VFD Gratis
-        </h1>
-        <p className="mt-2 text-sm sm:text-[15px] leading-relaxed text-surface-600 max-w-3xl">
-          MotorMatch membantu engineer memilih dan sizing motor berdasarkan mekanisme dan parameter
-          beban. Hitung <strong>torsi</strong>, <strong>inertia ratio (JL/JM)</strong>,{" "}
-          <strong>peak &amp; RMS torque</strong>, duty cycle, dan rekomendasi tipe motor untuk 13
-          mekanisme — Ball Screw, Rack &amp; Pinion, Conveyor, Rotary Table, Fan, Pump, Elevator,
-          dan lainnya. Dilengkapi katalog motor Mitsubishi, Yaskawa, Delta, Panasonic, Omron, serta
-          starting-point gain servo (Kv, Tvi, Kp).
-        </p>
-      </section>
-
       <MotorWizard />
 
-      {/* SEO static content below wizard - crawlable long-tail keywords */}
+      {/* SEO static content in footer - crawlable but not in header */}
       <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
         <div className="bg-white rounded-2xl shadow-soft border border-surface-200/70 p-6 md:p-8 mt-6">
-          <h2 className="text-lg font-semibold text-surface-900">Kenapa pakai MotorMatch?</h2>
+          <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-surface-900">
+            Kalkulator Sizing Motor Servo, Stepper &amp; Induksi + VFD Gratis
+          </h1>
+          <p className="mt-2 text-sm leading-relaxed text-surface-600">
+            MotorMatch membantu engineer memilih dan sizing motor berdasarkan mekanisme dan parameter
+            beban. Hitung <strong>torsi</strong>, <strong>inertia ratio (JL/JM)</strong>,{" "}
+            <strong>peak &amp; RMS torque</strong>, duty cycle, dan rekomendasi tipe motor untuk 13
+            mekanisme — Ball Screw, Rack &amp; Pinion, Conveyor, Rotary Table, Fan, Pump, Elevator,
+            dan lainnya. Dilengkapi katalog motor Mitsubishi, Yaskawa, Delta, Panasonic, Omron, serta
+            starting-point gain servo (Kv, Tvi, Kp).
+          </p>
+
+          <h2 className="mt-6 text-lg font-semibold text-surface-900">Kenapa pakai MotorMatch?</h2>
           <ul className="mt-3 grid sm:grid-cols-2 gap-3 text-sm text-surface-600">
             <li className="flex gap-2">
               <span className="text-primary-600">•</span>
