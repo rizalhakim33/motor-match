@@ -213,11 +213,6 @@ export default function MotorWizard() {
           />
         )}
       </main>
-
-      {/* Footer */}
-      <footer className="text-center py-6 text-surface-400 text-xs">
-        <p>MotorMatch MVP v0.1.0 — sizing sesuai technical guide servo standar</p>
-      </footer>
       </div>
     </div>
   );

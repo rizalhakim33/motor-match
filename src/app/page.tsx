@@ -5,8 +5,8 @@ export default function Home() {
     <div className="min-h-screen bg-surface-50">
       <MotorWizard />
 
-      {/* SEO static content in footer - crawlable but not in header */}
-      <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-10">
+      {/* SEO static content - crawlable but not in header */}
+      <section className="max-w-5xl mx-auto px-4 sm:px-6 pb-6">
         <div className="bg-white rounded-2xl shadow-soft border border-surface-200/70 p-6 md:p-8 mt-6">
           <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-surface-900">
             Kalkulator Sizing Motor Servo, Stepper &amp; Induksi + VFD Gratis
