@@ -1,0 +1,75 @@
+---
+title: "Cara Sizing Motor Servo untuk Ball Screw"
+slug: cara-sizing-motor-servo-untuk-ball-screw
+date: "2026-09-09"
+description: "Panduan lengkap menghitung torsi dan memilih motor servo untuk mekanisme ball screw. Cocok untuk engineer automation yang butuh starting point sizing."
+tags: ["tutorial", "ball-screw", "servo"]
+author: "MotorMatch"
+---
+
+## Apa itu Ball Screw?
+
+Ball screw adalah mekanisme rotary-to-linear motion yang menggunakan bola bearing untuk mengurangi gesekan. Umum digunakan di CNC, 3D printer, robot linear actuator, dan mesin industri lainnya.
+
+## Mengapa Sizing Motor Penting?
+
+Motor yang terlalu kecil → tidak cukup torsi, motor overheat.
+Motor yang terlalu besar → biaya mahal, inertia ratio tinggi, respon lambat.
+
+Sizing yang tepat memastikan:
+- Motor bekerja di bawah rated torque
+- Inertia ratio (JL/JM) dalam batas aman (idealnya < 10 untuk servo)
+- Duty cycle motor tidak melebihi 100%
+
+## Formula Dasar Ball Screw
+
+### 1. Load Torque (TL)
+
+```
+TL = (F × Pb) / (2π × η)
+```
+
+Dimana:
+- F = total force (N) = weight × sin(θ) + friction + external force
+- Pb = lead ball screw (mm/rev)
+- η = efficiency (umumnya 0.9 untuk ball screw)
+
+### 2. Acceleration Torque (TA)
+
+```
+TA = (JM + JL) × α / η
+```
+
+Dimana:
+- JM = motor inertia (kg·m²)
+- JL = load inertia (kg·m²)
+- α = angular acceleration (rad/s²)
+
+### 3. Peak Torque
+
+```
+Tpeak = TL + TA
+```
+
+### 4. RMS Torque (untuk duty cycle)
+
+```
+Trms = √[(T1²×t1 + T2²×t2 + ...) / (t1 + t2 + ...)]
+```
+
+## Langkah Sizing di MotorMatch
+
+1. **Pilih mekanisme** "Ball Screw"
+2. **Input parameter**: lead, load mass, angle, speed, cycle time
+3. **Lihat hasil**: torsi, inertia ratio, rekomendasi motor
+4. **Pilih motor** dari katalog → cek full sizing dengan JM aktual
+
+## Tips
+
+- Gunakan safety factor 1.2–1.5 untuk torsi
+- Perhatikan duty cycle, jangan sampai Trms > Trated motor
+- Jika inertia ratio > 15, pertimbangkan penambahan gear reducer
+
+---
+
+*Coba langsung di [MotorMatch](https://motormatch.my.id) — gratis, tidak perlu daftar.*

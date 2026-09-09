@@ -208,6 +208,18 @@ export interface GainResult {
   warnings: string[];
 }
 
+// === Article Types ===
+
+export interface ArticleMetadata {
+  title: string;
+  slug: string;
+  date: string;
+  description: string;
+  tags: string[];
+  thumbnail?: string;
+  author?: string;
+}
+
 export interface WizardState {
   currentStep: number;
   mechanismGroup: MechanismGroup | null;
