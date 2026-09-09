@@ -5,42 +5,36 @@ export default function ArticleCard({ article }: { article: ArticleMetadata }) {
   return (
     <Link
       href={`/blog/${article.slug}`}
-      className="group block bg-white rounded-2xl shadow-soft border border-surface-200/70 p-6 hover:shadow-medium hover:border-primary-200 transition-all"
+      className="group block py-6 border-b border-surface-100 last:border-0"
     >
-      <div className="flex items-center gap-2 flex-wrap mb-3">
-        {article.tags.slice(0, 2).map((tag) => (
-          <span
-            key={tag}
-            className="text-xs bg-primary-50 text-primary-700 px-2 py-0.5 rounded-full font-medium"
-          >
-            {tag}
+      <div className="flex items-center gap-3 text-sm mb-3">
+        {article.tags.length > 0 && (
+          <span className="bg-primary-100 text-primary-700 px-2.5 py-0.5 rounded-md text-xs font-medium">
+            {article.tags[0]}
           </span>
-        ))}
-      </div>
-
-      <h2 className="text-lg font-semibold text-surface-900 group-hover:text-primary-700 transition-colors leading-snug">
-        {article.title}
-      </h2>
-
-      <p className="mt-2 text-sm text-surface-500 line-clamp-2 leading-relaxed">
-        {article.description}
-      </p>
-
-      <div className="mt-4 flex items-center gap-3 text-xs text-surface-400">
-        <time dateTime={article.date}>
+        )}
+        <span className="text-surface-400">
           {new Date(article.date).toLocaleDateString("id-ID", {
             day: "numeric",
             month: "short",
             year: "numeric",
           })}
-        </time>
+        </span>
         {article.readingTime && (
           <>
             <span className="text-surface-300">&middot;</span>
-            <span>{article.readingTime} menit baca</span>
+            <span className="text-surface-400">{article.readingTime} menit</span>
           </>
         )}
       </div>
+
+      <h2 className="text-xl sm:text-2xl font-bold text-surface-900 group-hover:text-primary-600 transition-colors leading-snug">
+        {article.title}
+      </h2>
+
+      <p className="mt-2 text-surface-500 leading-relaxed line-clamp-2">
+        {article.description}
+      </p>
     </Link>
   );
 }
