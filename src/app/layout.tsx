@@ -160,8 +160,13 @@ export default function RootLayout({
 
   return (
     <html lang="id" className={`${inter.variable} ${jetbrainsMono.variable}`}>
-      <body className="min-h-screen bg-surface-50 font-sans">
-        {children}
+      <body className="min-h-screen bg-surface-50 font-sans flex flex-col">
+        <main className="flex-1">{children}</main>
+        <footer className="bg-surface-100 border-t border-surface-200 py-6">
+          <div className="max-w-5xl mx-auto px-4 sm:px-6 text-center text-sm text-surface-500">
+            <p>&copy; {new Date().getFullYear()} MotorMatch. Kalkulator sizing motor gratis untuk engineer.</p>
+          </div>
+        </footer>
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
