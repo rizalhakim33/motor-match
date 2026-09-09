@@ -1,9 +1,43 @@
 import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
-import type { ArticleMetadata } from "@/types";
+import type { ArticleMetadata, ArticleHeading } from "@/types";
 
 const articlesDir = path.join(process.cwd(), "src", "content", "articles");
+
+function calcReadingTime(content: string): number {
+  const wordsPerMinute = 200;
+  const words = content.replace(/<[^>]*>/g, "").split(/\s+/).length;
+  return Math.max(1, Math.ceil(words / wordsPerMinute));
+}
+
+function extractHeadings(content: string): ArticleHeading[] {
+  const headings: ArticleHeading[] = [];
+  const regex = /^(#{2,3})\s+(.+)$/gm;
+  let match;
+
+  while ((match = regex.exec(content)) !== null) {
+    const level = match[1].length;
+    const text = match[2].replace(/\*\*/g, "").replace(/`/g, "");
+    const slug = text
+      .toLowerCase()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-");
+
+    headings.push({ level, text, slug });
+  }
+
+  return headings;
+}
+
+function slugToId(slug: string): string {
+  return slug
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-");
+}
 
 export function getAllArticles(): ArticleMetadata[] {
   if (!fs.existsSync(articlesDir)) return [];
@@ -13,7 +47,7 @@ export function getAllArticles(): ArticleMetadata[] {
   const articles = files.map((filename) => {
     const filePath = path.join(articlesDir, filename);
     const fileContent = fs.readFileSync(filePath, "utf-8");
-    const { data } = matter(fileContent);
+    const { data, content } = matter(fileContent);
 
     return {
       title: data.title || filename.replace(/\.mdx$/, ""),
@@ -23,6 +57,8 @@ export function getAllArticles(): ArticleMetadata[] {
       tags: data.tags || [],
       thumbnail: data.thumbnail,
       author: data.author || "MotorMatch",
+      readingTime: calcReadingTime(content),
+      headings: extractHeadings(content),
     };
   });
 
@@ -39,16 +75,19 @@ export function getArticleBySlug(slug: string) {
     const fileContent = fs.readFileSync(filePath, "utf-8");
     const { data, content } = matter(fileContent);
 
-    if (data.slug === slug || filename.replace(/\.mdx$/, "") === slug) {
+    const fileSlug = data.slug || filename.replace(/\.mdx$/, "");
+    if (fileSlug === slug || filename.replace(/\.mdx$/, "") === slug) {
       return {
         metadata: {
           title: data.title || filename.replace(/\.mdx$/, ""),
-          slug: data.slug || filename.replace(/\.mdx$/, ""),
+          slug: fileSlug,
           date: data.date || "",
           description: data.description || "",
           tags: data.tags || [],
           thumbnail: data.thumbnail,
           author: data.author || "MotorMatch",
+          readingTime: calcReadingTime(content),
+          headings: extractHeadings(content),
         } as ArticleMetadata,
         content,
       };
@@ -69,4 +108,22 @@ export function getAllArticleSlugs(): string[] {
     const { data } = matter(fileContent);
     return data.slug || filename.replace(/\.mdx$/, "");
   });
+}
+
+export function getRelatedArticles(
+  currentSlug: string,
+  tags: string[],
+  limit = 3
+): ArticleMetadata[] {
+  const allArticles = getAllArticles();
+
+  return allArticles
+    .filter((a) => a.slug !== currentSlug)
+    .map((a) => ({
+      article: a,
+      score: a.tags.filter((t) => tags.includes(t)).length,
+    }))
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map((item) => item.article);
 }

@@ -7,69 +7,244 @@ tags: ["tutorial", "ball-screw", "servo"]
 author: "MotorMatch"
 ---
 
+## Pendahuluan
+
+Ball screw adalah salah satu mekanisme **rotary-to-linear motion** yang paling banyak digunakan di industri automation. Dari CNC machine hingga robot linear actuator, ball screw menawarkan presisi tinggi dengan gesekan rendah.
+
+Artikel ini akan membahas **step-by-step** cara sizing motor servo untuk ball screw, termasuk formula yang digunakan dan tips praktis untuk engineer.
+
+---
+
 ## Apa itu Ball Screw?
 
-Ball screw adalah mekanisme rotary-to-linear motion yang menggunakan bola bearing untuk mengurangi gesekan. Umum digunakan di CNC, 3D printer, robot linear actuator, dan mesin industri lainnya.
+Ball screw terdiri dari tiga komponen utama:
+
+1. **Screw shaft** — poros berulir yang berputar
+2. **Nut** — komponen yang bergerak linear mengikuti ulir
+3. **Ball bearing** — bola yang mengurangi gesekan antara screw dan nut
+
+### Kelebihan Ball Screw
+
+- **Efisiensi tinggi** — umumnya 90% (vs 30-50% untuk Acme screw)
+- **Presisi** — backlash sangat kecil, cocok untuk positioning
+- **Durabilitas** — umur panjang karena gesekan rendah
+
+### Aplikasi Umum
+
+| Industri | Contoh Aplikasi |
+|----------|-----------------|
+| Manufacturing | CNC milling, lathe Z-axis |
+| Packaging | Linear actuator untuk pusher |
+| Semiconductor | Wafer handling robot |
+| Medical | CT scanner bed movement |
+
+---
 
 ## Mengapa Sizing Motor Penting?
 
-Motor yang terlalu kecil → tidak cukup torsi, motor overheat.
-Motor yang terlalu besar → biaya mahal, inertia ratio tinggi, respon lambat.
+> **"Motor yang tepat = performa optimal + biaya efisien"**
 
-Sizing yang tepat memastikan:
-- Motor bekerja di bawah rated torque
-- Inertia ratio (JL/JM) dalam batas aman (idealnya < 10 untuk servo)
-- Duty cycle motor tidak melebihi 100%
+Sizing yang salah memiliki konsekuensi serius:
+
+- **Motor terlalu kecil** → overheat, gagal mencapai target speed, motor burnout
+- **Motor terlalu besar** → biaya mahal, inertia ratio tinggi, respon lambat, pemborosan energi
+
+### Kriteria Sizing yang Baik
+
+1. **Torsi** — motor harus mampu mengatasi beban statis + dinamis
+2. **Inertia ratio (JL/JM)** — idealnya < 10 untuk servo, < 50 untuk stepper
+3. **Duty cycle** — RMS torque harus di bawah rated torque motor
+4. **Speed** — rated speed motor harus memenuhi kebutuhan aplikasi
+
+---
 
 ## Formula Dasar Ball Screw
 
 ### 1. Load Torque (TL)
 
+Load torque adalah torsi yang dibutuhkan untuk menggerakkan beban secara kontinyu.
+
+**Formula:**
+
 ```
 TL = (F × Pb) / (2π × η)
 ```
 
-Dimana:
-- F = total force (N) = weight × sin(θ) + friction + external force
-- Pb = lead ball screw (mm/rev)
-- η = efficiency (umumnya 0.9 untuk ball screw)
+**Keterangan:**
+
+- `F` = total force (N) = weight × sin(θ) + friction + external force
+- `Pb` = lead ball screw (mm/rev)
+- `η` = efficiency (umumnya 0.9 untuk ball screw)
+
+**Contoh perhitungan:**
+
+Misalnya beban 50 kg, sudut 0° (horizontal), lead 10 mm, friction coefficient 0.003:
+
+```
+F = M × g × sin(0°) + μ × M × g × cos(0°)
+F = 50 × 9.81 × 0 + 0.003 × 50 × 9.81 × 1
+F = 1.47 N (hanya friction)
+
+TL = (1.47 × 0.01) / (2π × 0.9)
+TL = 0.0026 N·m
+```
 
 ### 2. Acceleration Torque (TA)
+
+Acceleration torque dibutuhkan untuk mengubah kecepatan dari 0 ke target speed dalam waktu tertentu.
+
+**Formula:**
 
 ```
 TA = (JM + JL) × α / η
 ```
 
-Dimana:
-- JM = motor inertia (kg·m²)
-- JL = load inertia (kg·m²)
-- α = angular acceleration (rad/s²)
+**Keterangan:**
+
+- `JM` = motor inertia (kg·m²)
+- `JL` = load inertia (kg·m²)
+- `α` = angular acceleration (rad/s²)
+
+**Cara menghitung α:**
+
+```
+α = (2π × N) / (60 × tA)
+```
+
+Dimana `N` = target speed (rpm), `tA` = acceleration time (detik)
 
 ### 3. Peak Torque
+
+Peak torque adalah torsi maksimum yang dibutuhkan saat fase akselerasi.
 
 ```
 Tpeak = TL + TA
 ```
 
-### 4. RMS Torque (untuk duty cycle)
+### 4. RMS Torque (untuk Duty Cycle)
+
+RMS torque digunakan untuk mengecek apakah motor bisa menghandle siklus kerja.
 
 ```
-Trms = √[(T1²×t1 + T2²×t2 + ...) / (t1 + t2 + ...)]
+Trms = √[(T1²×t1 + T2²×t2 + T3²×t3) / (t1 + t2 + t3)]
 ```
 
-## Langkah Sizing di MotorMatch
-
-1. **Pilih mekanisme** "Ball Screw"
-2. **Input parameter**: lead, load mass, angle, speed, cycle time
-3. **Lihat hasil**: torsi, inertia ratio, rekomendasi motor
-4. **Pilih motor** dari katalog → cek full sizing dengan JM aktual
-
-## Tips
-
-- Gunakan safety factor 1.2–1.5 untuk torsi
-- Perhatikan duty cycle, jangan sampai Trms > Trated motor
-- Jika inertia ratio > 15, pertimbangkan penambahan gear reducer
+Dimana:
+- `T1, T2, T3` = torsi di masing-masing fase
+- `t1, t2, t3` = durasi masing-masing fase
 
 ---
 
-*Coba langsung di [MotorMatch](https://motormatch.my.id) — gratis, tidak perlu daftar.*
+## Langkah Sizing di MotorMatch
+
+Berikut cara menggunakan MotorMatch untuk sizing motor ball screw:
+
+### Step 1: Pilih Mekanisme
+
+Pilih **"Ball Screw"** dari daftar mekanisme yang tersedia.
+
+### Step 2: Input Parameter
+
+Masukkan parameter berikut:
+
+- **Lead (Pb)** — jarak linear per putaran (mm)
+- **Load mass** — berat beban (kg)
+- **Sudut kemiringan** — 0° untuk horizontal
+- **Target speed** — kecepatan yang dibutuhkan (rpm)
+- **Cycle time** — waktu siklus kerja (detik)
+- **Acceleration time** — waktu percepatan (detik)
+
+### Step 3: Lihat Hasil Sizing
+
+MotorMatch akan menghitung dan menampilkan:
+
+- **Load torque (TL)** — torsi untuk menggerakkan beban
+- **Acceleration torque (TA)** — torsi untuk percepatan
+- **Peak torque** — torsi maksimum
+- **RMS torque** — untuk cek duty cycle
+- **Inertia ratio (JL/JM)** — rasio inersia beban terhadap motor
+- **Rekomendasi tipe motor** — servo, stepper, atau induksi+VFD
+
+### Step 4: Pilih Motor dari Katalog
+
+Pilih motor dari katalog yang tersedia (Mitsubishi, Yaskawa, Delta, dll). MotorMatch akan menghitung **full sizing** dengan JM aktual motor yang dipilih.
+
+---
+
+## Tips Praktis
+
+### Safety Factor
+
+Gunakan safety factor **1.2 – 1.5** untuk torsi. Ini memberikan margin untuk:
+- Variasi beban aktual
+- Perubahan kondisi operasi
+- Degradasi komponen seiring waktu
+
+### Inertia Ratio
+
+| Ratio | Kondisi | Rekomendasi |
+|-------|---------|-------------|
+| < 5 | Ideal | Tidak perlu gear |
+| 5 – 10 | Acceptable | Bisa tanpa gear |
+| 10 – 15 | Marginal | Pertimbangkan gear |
+| > 15 | Terlalu tinggi | **Wajib gunakan gear** |
+
+### Duty Cycle
+
+Pastikan **Trms < Trated** motor. Jika Trms mendekati Trated, pilih motor satu tingkat lebih besar.
+
+### Kesalahan Umum
+
+- **Mengabaikan friction** — friction bisa signifikan, terutama untuk lead screw
+- **Salah hitung JL** — gunakan rumus yang benar untuk ball screw inertia
+- **Tidak mempertimbangkan acceleration time** — waktu percepanan yang terlalu pendek = TA tinggi
+
+---
+
+## Rumus Lengkap: Load Inertia Ball Screw
+
+Untuk menghitung load inertia (JL) yang dilihat dari sisi motor:
+
+```
+JL = M × (Pb / 2π)² / η + Jscrew
+```
+
+Dimana:
+- `M` = mass beban (kg)
+- `Pb` = lead (m/rev)
+- `η` = efficiency
+- `Jscrew` = inertia ball screw shaft (kg·m²)
+
+---
+
+## Kesimpulan
+
+Sizing motor untuk ball screw melibatkan:
+
+1. **Menghitung load torque** berdasarkan beban dan lead
+2. **Menghitung acceleration torque** berdasarkan inertia dan waktu percepatan
+3. **Cek peak torque** — harus di bawah max torque motor
+4. **Cek RMS torque** — harus di bawah rated torque motor
+5. **Cek inertia ratio** — idealnya < 10 untuk servo
+
+Gunakan [MotorMatch](https://motormatch.my.id) untuk melakukan perhitungan ini secara otomatis dan mendapatkan rekomendasi motor yang sesuai.
+
+---
+
+## FAQ
+
+### Berapa safety factor yang recommended?
+
+Untuk aplikasi umum, gunakan **1.2 – 1.5**. Untuk aplikasi kritis (medical, aerospace), gunakan **2.0 atau lebih**.
+
+### Kapan harus pakai gear reducer?
+
+Jika inertia ratio > 10, pertimbangkan gear reducer. Gear reducer mengurangi JL yang dilihat motor dengan faktor G².
+
+### Bagaimana jika aplikasi vertikal?
+
+Untuk aplikasi vertikal (θ = 90°), beban gravitasi berkontribusi signifikan. Tambahkan komponen `M × g × sin(90°)` ke dalam perhitungan force.
+
+---
+
+*Coba langsung sizing motor ball screw di [MotorMatch](https://motormatch.my.id) — gratis, tidak perlu daftar.*

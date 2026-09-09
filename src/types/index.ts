@@ -210,6 +210,12 @@ export interface GainResult {
 
 // === Article Types ===
 
+export interface ArticleHeading {
+  level: number;
+  text: string;
+  slug: string;
+}
+
 export interface ArticleMetadata {
   title: string;
   slug: string;
@@ -218,6 +224,8 @@ export interface ArticleMetadata {
   tags: string[];
   thumbnail?: string;
   author?: string;
+  readingTime?: number;
+  headings?: ArticleHeading[];
 }
 
 export interface WizardState {
