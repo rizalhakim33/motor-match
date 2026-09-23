@@ -1,0 +1,192 @@
+---
+title: "Cara Tuning Gain Servo Motor: Panduan Setting Kv, Tvi & Kp"
+slug: cara-tuning-gain-servo-motor
+date: "2026-09-23"
+description: "Panduan praktis tuning gain servo motor dengan teori cascade P-PI. Hitung starting-point Kv, Tvi, Kp dari inertia ratio dan torque constant, plus konversi parameter per brand."
+tags: ["servo", "gain", "tuning", "tutorial"]
+author: "MotorMatch"
+---
+
+## Pendahuluan
+
+Servo yang sudah di-sizing dengan benar bisa tetap tidak stabil, getar, atau error posisi jika gain-nya salah. Artikel ini menjelaskan cara mendapatkan **nilai gain awal (starting point)** yang benar berdasarkan data motor dan beban — bukan trial-and-error manual.
+
+Metode yang dipakai adalah teori kontrol **cascade P-PI** (posisi → kecepatan → arus), standar mayoritas servo drive modern: Mitsubishi, Yaskawa, Delta, Panasonic, Omron, dan lainnya.
+
+---
+
+## Arsitektur Cascade P-PI
+
+Setiap drive servo modern mengontrol tiga loop berlapis:
+
+| Loop | Parameter | Fungsi |
+|------|-----------|--------|
+| **Posisi** | Kp (position gain) | Seberapa cepat error posisi dikoreksi |
+| **Kecepatan** | Kv (speed gain), Tvi (integral time) | Meredam overspeed dan menghilangkan steady-state error |
+| **Arus** | (sudah di-set pabrik) | Mengontrol torsi motor |
+
+Prinsip stabilitas cascade: **bandwidth loop posisi harus lebih rendah dari bandwidth loop kecepatan**. Rasio umumnya 1:4 sampai 1:6.
+
+```
+Loop Posisi (Kp)  →  Loop Kecepatan (Kv, Tvi)  →  Loop Arus (fixed)
+  bandwidth paling rendah            bandwidth lebih tinggi
+```
+
+---
+
+## Data yang Dibutuhkan
+
+Sebelum menghitung gain, siapkan tiga data ini:
+
+1. **Inersia motor (JM)** — dari datasheet/katalog motor (kg·m²)
+2. **Inersia beban (JL)** — hasil sizing mekanisme, sudah direfleksikan ke sisi motor
+3. **Torque constant (Kt)** — dari datasheet (N·m/A)
+
+Lalu hitung:
+
+```
+Jtotal = JM + JL          (total inersia)
+Rasio inersia = JL / JM
+```
+
+> Rasio inersia adalah faktor #1 yang menentukan seberapa agresif gain boleh di-set. Rasio > 15 wajib tuning lebih hati-hati; rasio > 30 sebaiknya diredam dulu dengan gear reduction.
+
+---
+
+## Langkah 1: Pilih Bandwidth Kecepatan (ωv)
+
+Bandwidth loop kecepatan `ωv` (rad/s) menentukan respons sistem. Pilih berdasar rasio inersia:
+
+| Rasio inersia (JL/JM) | ωv awal (rad/s) | Keterangan |
+|---|---|---|
+| < 5 | 100–150 | Beban ringan, boleh agresif |
+| 5–10 | 50–100 | Beban sedang |
+| 10–15 | 40–60 | Beban berat |
+| 15–30 | 30–40 | Sangat berat, tuning hati-hati |
+| > 30 | ~30 | Pertimbangkan gear reduction dulu |
+
+---
+
+## Langkah 2: Hitung Speed Loop Gain (Kv)
+
+```
+Kv = ωv × Jtotal / Kt
+```
+
+- `Kv` dalam rad/s (atau 1/s — keduanya ekuivalen secara dimensi)
+- `Kt` = torque constant motor (N·m/A)
+
+Kv yang terlalu tinggi menyebabkan getar/oscillation di frekuensi tinggi. Kv yang terlalu rendah membuat respons lemot dan error posisi besar.
+
+---
+
+## Langkah 3: Hitung Speed Integral Time (Tvi)
+
+```
+Tvi = k × Jtotal / (Kv × Kt)
+```
+
+`k` = konstanta damping, umumnya **2–4** untuk damping ratio ~0.7–1.0. Nilai k = 3 adalah titik tengah yang moderat.
+
+Satuan hasilnya dalam detik, konversi ke **ms** untuk parameter drive.
+
+Catatan: beberapa brand menyebut parameter ini sebagai **Tn** (Baumüller) atau **integral time/compensation** (Mitsubishi, Yaskawa). Maknanya sama — semakin kecil Tvi, semakin agresif koreksi steady-state error, tapi semakin mudah oscillasi.
+
+---
+
+## Langkah 4: Hitung Position Loop Gain (Kp)
+
+```
+Kp = ωv / 4  sampai  ωv / 6
+```
+
+Ambil tengahnya `ωv / 5` sebagai starting point. Syarat stabilitas: Kp harus **lebih kecil** dari Kv (bandwidth posisi < bandwidth kecepatan).
+
+---
+
+## Contoh Perhitungan
+
+Motor: inersia JM = 0.5 × 10⁻⁴ kg·m², Kt = 0.34 N·m/A. Beban JL = 15 × 10⁻⁴ kg·m².
+
+```
+Rasio inersia = 15e-4 / 0.5e-4 = 30  → pilih ωv = 30 rad/s (sangat berat)
+Jtotal = 0.5e-4 + 15e-4 = 15.5e-4 kg·m²
+
+Kv  = 30 × 15.5e-4 / 0.34      ≈ 136.8 rad/s
+Tvi = 3 × 15.5e-4 / (136.8 × 0.34) × 1000 ≈ 10.0 ms
+Kp  = 30 / 5                    ≈ 6.0 1/s
+```
+
+Dengan rasio 30, sistem akan memberi peringatan: gain mungkin perlu tuning lebih hati-hati, pertimbangkan gear reduction.
+
+---
+
+## Konversi ke Parameter per Brand
+
+Setiap brand punya "dialek" parameter sendiri untuk tiga parameter yang sama:
+
+| Parameter generik | Mitsubishi (MR-J) | Yaskawa (Sigma) | Delta (ASDA) | Panasonic (MINAS) | Baumüller |
+|---|---|---|---|---|---|
+| **Kv** | Speed Gain 1 (PB) | Speed Loop Gain (PG2) | Velocity Loop Gain (KV) | Speed Loop Gain (VGN) | Kv |
+| **Tvi** | Speed Integral Compensation | Speed Loop Integral Time (TI) | Velocity Integral Time (TI) | Speed Loop Integral Time (VGI) | Tn |
+| **Kp** | Position Loop Gain (PA) | Position Loop Gain (PG1) | Position Loop Gain (KP) | Position Loop Gain (PGN) | Kp |
+
+Perbedaan format yang perlu diperhatikan:
+
+- **Delta** memakai satuan **Hz** — konversi dari rad/s: `nilai_Hz = rad/s / 2π`
+- **Mitsubishi/INVT** memakai skala level (mis. 1–30) yang **non-linear dan proprietary** — hanya bisa diberi perkiraan kasar dari tabel referensi manual, bukan konversi eksak
+- **Yaskawa/Omron** memakai satuan 1/s, langsung setara rad/s
+
+---
+
+## Verifikasi di Lapangan
+
+Gain hasil hitungan hanyalah **starting point**. Setelah di-set, verifikasi dengan langkah berikut:
+
+1. **Uji step response** — beri perintah posisi kecil, amankan overshoot dan settling time. Overshoot ideal < 25%.
+2. **Dengarkan motor** — dengung/whining berarti Kv terlalu tinggi atau ada resonansi.
+3. **Cek steady-state error** — masih ada error statis → kurangi Tvi (lebih agresif).
+4. **Uji di kecepatan penuh** — pastikan tidak ada oscillation saat accel/decel.
+
+Urutan tuning yang aman: **naikkan Kv bertahap** → atur Tvi untuk meredam overshoot → set Kp terakhir.
+
+---
+
+## Yang TIDAK Bisa Dihitung di Awal
+
+Beberapa hal butuh pengukuran langsung di lapangan:
+
+- **Notch filter** untuk resonansi mekanis — butuh FFT/oscilloscope untuk mengukuru frekuensi resonansi aktual
+- **Feedforward gain** — butuh profil gerak (velocity/acceleration profile) per aplikasi
+- **Auto-tuning** — butuh koneksi live ke drive
+
+Jika sistem getar pada kecepatan tertentu meski gain sudah sesuai hitungan, itu indikasi resonansi mekanis — bukan masalah gain. Tambahkan notch filter pada frekuensi yang terukur.
+
+---
+
+## Cara Cek di MotorMatch
+
+Masukkan parameter motor dan beban di [MotorMatch](https://motormatch.my.id), lalu lihat bagian **Gain Calculator**. Sistem akan menghitung Kv, Tvi, Kp dari Jtotal dan Kt motor terpilih, dan menampilkan hasilnya dalam dialek parameter sesuai brand (Mitsubishi, Yaskawa, Delta, Panasonic, Omron, Baumüller).
+
+---
+
+## FAQ
+
+### Apakah gain hasil hitungan langsung final?
+Tidak. Nilai tersebut starting point. Verifikasi dan fine-tuning tetap perlu dilakukan di lapangan dengan step response test.
+
+### Kenapa servo saya bergetar setelah gain dinaikkan?
+Kv terlalu tinggi untuk rasio inersia beban Anda, atau ada resonansi mekanis. Turunkan Kv, dan jika getar hanya di frekuensi tertentu, tambahkan notch filter.
+
+### Berapa rasio inersia maksimum yang aman untuk tuning?
+Idealnya < 10. Di atas 15 tuning menjadi sulit, di atas 30 sebaiknya tambah gear reduction dulu sebelum tuning.
+
+### Apakah semua brand memakai cascade P-PI?
+Mayoritas ya (Mitsubishi, Yaskawa, Delta, Panasonic, Omron). Beberapa drive high-end punya struktur berbeda atau auto-tuning internal, tapi konsep bandwidth posisi < kecepatan tetap berlaku.
+
+### Apa bedanya Kv dan Kp?
+Kv mengontrol loop kecepatan (seberapa cepat kecepatan aktual mengikuti referensi), Kp mengontrol loop posisi (seberapa cepat error posisi dikoreksi). Kp harus lebih kecil dari Kv agar loop posisi stabil.
+
+---
+
+*Coba hitung gain awal servo Anda di [MotorMatch](https://motormatch.my.id) — gratis, tidak perlu daftar.*
