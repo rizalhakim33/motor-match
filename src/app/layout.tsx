@@ -160,6 +160,13 @@ export default function RootLayout({
 
   return (
     <html lang="id" className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <head>
+        <script
+          src="https://analytics.ahrefs.com/analytics.js"
+          data-key="9OjuxE8ZqtLCa5ews3Znbg"
+          async
+        />
+      </head>
       <body className="min-h-screen bg-surface-50 font-sans flex flex-col">
         <main className="flex-1">{children}</main>
         <footer className="bg-surface-100 border-t border-surface-200 py-6">
