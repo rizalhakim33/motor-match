@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Link from "next/link";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -171,7 +172,7 @@ export default function RootLayout({
         <main className="flex-1">{children}</main>
         <footer className="bg-surface-100 border-t border-surface-200 py-6">
           <div className="max-w-5xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-center gap-4 text-sm text-surface-500">
-            <a href="/blog" className="hover:text-primary-600 transition-colors">Blog</a>
+            <Link href="/blog" className="hover:text-primary-600 transition-colors">Blog</Link>
             <span className="hidden sm:inline">&middot;</span>
             <p>&copy; {new Date().getFullYear()} MotorMatch. Kalkulator sizing motor gratis untuk engineer.</p>
           </div>

@@ -6,7 +6,7 @@
     "dev": "next dev -p 3050",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint .",
     "test": "tsx test/ballscrew.test.ts && tsx test/fan-generic-rotary.test.ts && tsx test/fullSizing.test.ts && tsx test/gainCalculator.test.ts && tsx test/new-mechanisms.test.ts",
     "test:ballscrew": "tsx test/ballscrew.test.ts",
     "test:fan": "tsx test/fan-generic-rotary.test.ts",
